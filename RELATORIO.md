@@ -139,7 +139,8 @@ Resultado: [x] Idênticos [ ] Diferentes
 **1. Por que devemos verificar que bytes_escritos == bytes_lidos?**
 
 ```
-É preciso verificar para saber se todos os dados recebidos no arquivo de origem foram armazenados no arquivo de destino.
+É preciso verificar para saber se todos os dados recebidos no arquivo de origem foram armazenados no arquivo de 
+destino.
 ```
 
 **2. Que flags são essenciais no open() do destino?**
@@ -159,13 +160,17 @@ Sim. No código fazemos a chamada de uma syscall read e logo em seguida fazemos 
 **4. Como você saberia se o disco ficou cheio?**
 
 ```
-Poderíamos receber um erro durante o while. Quando fazemos uma chamada write(), retorna os bytes lidos. Se por acaso, retornar -1, ocorre algum erro. Ou também, ao analisar o strace, ver os retornos da syscalls de read() retornando sempre a quantidade de bytes lidos, porém as syscall de write() não.
+Poderíamos receber um erro durante o while. Quando fazemos uma chamada write(), retorna os bytes lidos. 
+Se por acaso, retornar -1, ocorre algum erro. Ou também, ao analisar o strace, ver os retornos da syscalls de read()
+retornando sempre a quantidade de bytes lidos, porém as syscall de write() não.
 ```
 
 **5. O que acontece se esquecer de fechar os arquivos?**
 
 ```
-[Sua análise aqui]
+A função close é feita para liberar os recursos do sistema. Além de que em um processo temos um número de file 
+descriptors limitado e não fechando os arquivos, consequentemente não será possível criar mais file descriptors,
+prejudicando o desenvolvimento de um processo.
 ```
 
 ---
@@ -189,7 +194,9 @@ Poderíamos receber um erro durante o while. Quando fazemos uma chamada write(),
 **3. Discorra sobre a relação entre o tamanho do buffer e performance:**
 
 ```
-[Sua análise aqui]
+Um buffer maior consegue armazenar mais dados, resultando em poucas chamadas de syscalls, diferente de um buffer 
+pequeno, que por ser de um tamanho menor, deve realizar syscalls com mais frequência. Sabendo que syscalls levam 
+tempo, podemos concluir que um buffer maior tem uma performance melhor. 
 ```
 
 ### ⚡ Comparação de Performance
@@ -200,7 +207,7 @@ time ./ex4_copia
 time cp dados/origem.txt dados/destino_cp.txt
 ```
 
-**Qual foi mais rápido?** _____
+**Qual foi mais rápido?** time ./ex4_copia
 
 **Por que você acha que foi mais rápido?**
 
@@ -212,9 +219,9 @@ time cp dados/origem.txt dados/destino_cp.txt
 
 ## 📤 Entrega
 Certifique-se de ter:
-- [ ] Todos os códigos com TODOs completados
-- [ ] Traces salvos em `traces/`
-- [ ] Este relatório preenchido como `RELATORIO.md`
+- [x] Todos os códigos com TODOs completados
+- [x] Traces salvos em `traces/`
+- [x] Este relatório preenchido como `RELATORIO.md`
 
 ```bash
 strace -e write -o traces/ex1a_trace.txt ./ex1a_printf
