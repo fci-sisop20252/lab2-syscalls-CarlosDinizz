@@ -13,19 +13,24 @@ strace -e write ./ex1b_write
 ### 🔍 Análise
 
 **1. Quantas syscalls write() cada programa gerou?**
-- ex1a_printf: _____ syscalls
-- ex1b_write: _____ syscalls
+- ex1a_printf: 9 syscalls
+- ex1b_write: 7 syscalls
 
 **2. Por que há diferença entre os dois métodos? Consulte o docs/printf_vs_write.md**
 
 ```
-[Sua análise aqui]
+O printf pode ter um comportamento diferente por conta 
+do \n que acontece no final. 
+Além de que, quando temos um \n duplo, no segundo o buffer é forçado 
+a ser enviado como um único byte.
 ```
 
 **3. Qual método é mais previsível? Por quê você acha isso?**
 
 ```
-[Sua análise aqui]
+Método write. É este método porque, o quê exatamente acontece é que 
+toda vez que temos uma chamada do write() temos uma syscall 
+acontecendo.
 ```
 
 ---
@@ -33,8 +38,8 @@ strace -e write ./ex1b_write
 ## 2️⃣ Exercício 2 - Leitura de Arquivo
 
 ### 📊 Resultados da execução:
-- File descriptor: _____
-- Bytes lidos: _____
+- File descriptor: 3
+- Bytes lidos: 127
 
 ### 🔧 Comando strace:
 ```bash
@@ -46,19 +51,26 @@ strace -e openat,read,close ./ex2_leitura
 **1. Qual file descriptor foi usado? Por que não começou em 0, 1 ou 2?**
 
 ```
-[Sua análise aqui]
+3. Porque está sendo aberto um arquivo, diferente do 0,
+que é a entrada via teclado, o 1, que é saída no terminal e 
+o 2, que é saída de erro no terminal. Neste caso, está 
+acontecendo algo diferente.
 ```
 
 **2. Como você sabe que o arquivo foi lido completamente?**
 
 ```
-[Sua análise aqui]
+Na função read, no terceiro parâmetro, temos o 
+número máximo de bytes para ler. Rodando o
+strace, podemos observar o '=' depois da função
+de read, no qual, retornou a quantidade de bytes
+que foi colocado na função.
 ```
 
 **3. Por que verificar retorno de cada syscall?**
 
 ```
-[Sua análise aqui]
+Para verificar se houve sucesso nessa chamada.
 ```
 
 ---
@@ -66,38 +78,44 @@ strace -e openat,read,close ./ex2_leitura
 ## 3️⃣ Exercício 3 - Contador com Loop
 
 ### 📋 Resultados (BUFFER_SIZE = 64):
-- Linhas: _____ (esperado: 25)
-- Caracteres: _____
-- Chamadas read(): _____
-- Tempo: _____ segundos
+- Linhas: 25 (esperado: 25)
+- Caracteres: 1325
+- Chamadas read(): 21
+- Tempo: 0.002253 segundos
 
 ### 🧪 Experimentos com buffer:
 
 | Buffer Size | Chamadas read() | Tempo (s) |
 |-------------|-----------------|-----------|
-| 16          |                 |           |
-| 64          |                 |           |
-| 256         |                 |           |
-| 1024        |                 |           |
+| 16          |83                 |0.001534           |
+| 64          |21                 |0.000428           |
+| 256         |6                 |0.000299           |
+| 1024        |2                 |0.000251           |
 
 ### 🔍 Análise
 
 **1. Como o tamanho do buffer afeta o número de syscalls?**
 
 ```
-[Sua análise aqui]
+Acontece que com o buffer, maior é possível ler mais caracteres,
+que estão armazenados no mesmo ao realizar o read(). Logo, quanto mais 
+caracteres armazenados no buffer(buffer grande) menor é a quantidade de 
+syscalls.
 ```
 
 **2. Todas as chamadas read() retornaram BUFFER_SIZE bytes? Discorra brevemente sobre**
 
 ```
-[Sua análise aqui]
+Não. Nos últimos read(), utilizando 64 de buffer por exemplo, o penúltimo retorna 45 e o 
+último retorna 0. Isso acontece porque as linhas não possuem as mesmas quantidades de 
+caracteres que o buffer tem de tamanho, 64 caracteres no caso. Então, próximo do final, vai 
+sobrar alguns caracteres.
 ```
 
 **3. Qual é a relação entre syscalls e performance?**
 
 ```
-[Sua análise aqui]
+Acontece que cada chamada de syscall é custoso e leva tempo.
 ```
 
 ---
@@ -105,41 +123,43 @@ strace -e openat,read,close ./ex2_leitura
 ## 4️⃣ Exercício 4 - Cópia de Arquivo
 
 ### 📈 Resultados:
-- Bytes copiados: _____
-- Operações: _____
-- Tempo: _____ segundos
-- Throughput: _____ KB/s
+- Bytes copiados: 1397
+- Operações: 6
+- Tempo: 0.000569 segundos
+- Throughput: 2397.64 KB/s
 
 ### ✅ Verificação:
 ```bash
 diff dados/origem.txt dados/destino.txt
 ```
-Resultado: [ ] Idênticos [ ] Diferentes
+Resultado: [x] Idênticos [ ] Diferentes
 
 ### 🔍 Análise
 
 **1. Por que devemos verificar que bytes_escritos == bytes_lidos?**
 
 ```
-[Sua análise aqui]
+É preciso verificar para saber se todos os dados recebidos no arquivo de origem foram armazenados no arquivo de destino.
 ```
 
 **2. Que flags são essenciais no open() do destino?**
 
 ```
-[Sua análise aqui]
+O_WRONLY para escrever no arquivo de destino.
+O_CREAT para criar o arquivo, caso não exista.
+O_TRUNC para sobrescrever o arquivo
 ```
 
 **3. O número de reads e writes é igual? Por quê?**
 
 ```
-[Sua análise aqui]
+Sim. No código fazemos a chamada de uma syscall read e logo em seguida fazemos a chamada de uma syscall write. 
 ```
 
 **4. Como você saberia se o disco ficou cheio?**
 
 ```
-[Sua análise aqui]
+Poderíamos receber um erro durante o while. Quando fazemos uma chamada write(), retorna os bytes lidos. Se por acaso, retornar -1, ocorre algum erro. Ou também, ao analisar o strace, ver os retornos da syscalls de read() retornando sempre a quantidade de bytes lidos, porém as syscall de write() não.
 ```
 
 **5. O que acontece se esquecer de fechar os arquivos?**

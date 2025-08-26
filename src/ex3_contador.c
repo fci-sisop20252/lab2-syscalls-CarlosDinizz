@@ -30,7 +30,7 @@ int main() {
     printf("=== Exercício 3: Contador de Linhas ===\n");
     printf("Buffer: %d bytes\n\n", BUFFER_SIZE);
     
-    fd = open("dados/teste2.txt", O_RDONLY);
+    fd = open("../dados/teste2.txt", O_RDONLY);
     if (fd < 0) {
         perror("Erro ao abrir dados/teste2.txt");
         return 1;
@@ -40,7 +40,8 @@ int main() {
      * TODO 1: Implementar loop de leitura
      * Loop até read() retornar 0 (fim do arquivo)
      */
-    while (/* TODO: condição do loop */) {
+    bytes_lidos = read(fd, buffer, sizeof(buffer));
+    while (bytes_lidos != 0) {
         total_reads++;
         
         /*
@@ -48,22 +49,28 @@ int main() {
          */
         for (int i = 0; i < bytes_lidos; i++) {
             /* TODO: verificar '\n' e incrementar total_linhas */
+            if (buffer[i] == '\n'){
+                total_linhas++;
+            }
+        
         }
         
         /*
          * TODO 3: Somar total de caracteres
          */
         /* TODO: total_caracteres += ... */;
+        total_caracteres += bytes_lidos;
         
         if (total_reads % 10 == 0) {
             printf("Processadas %d chamadas read()...\n", total_reads);
         }
+        bytes_lidos = read(fd, buffer, sizeof(buffer));
     }
     
     /*
      * TODO 4: Verificar se houve erro na leitura
      */
-    if (/* TODO: condição de erro */) {
+    if (bytes_lidos == -1) {
         perror("Erro na leitura");
         close(fd);
         return 1;
