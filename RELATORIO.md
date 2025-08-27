@@ -81,7 +81,7 @@ Para verificar se houve sucesso nessa chamada.
 - Linhas: 25 (esperado: 25)
 - Caracteres: 1325
 - Chamadas read(): 21
-- Tempo: 0.002253 segundos
+- Tempo: 0.000428 segundos
 
 ### 🧪 Experimentos com buffer:
 
