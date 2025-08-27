@@ -182,13 +182,16 @@ prejudicando o desenvolvimento de um processo.
 **1. Como as syscalls demonstram a transição usuário → kernel?**
 
 ```
-[Sua análise aqui]
+O usuário não possui autorização para realizar as operações privilegiadas: ler arquivo ou escrever. Apenas o Kernel 
+consegue realizar essas ações. Desta forma, somente ao fazer as syscalls, essas operações podem ser realizadas. 
+Usuário -> syscall read(), write() -> kernel.
 ```
 
 **2. Qual é o seu entendimento sobre a importância dos file descriptors?**
 
 ```
-[Sua análise aqui]
+Fazendo o código e analisando o strace, vi que o file descriptor é essencial para realizar as syscalls. Tanto para 
+o write(), quanto para o read(), é necessário indicar qual o identificador para realizar a chamada.
 ```
 
 **3. Discorra sobre a relação entre o tamanho do buffer e performance:**
@@ -212,7 +215,9 @@ time cp dados/origem.txt dados/destino_cp.txt
 **Por que você acha que foi mais rápido?**
 
 ```
-[Sua análise aqui]
+Porque no programa que foi feito vamos direto ao ponto: ler o arquivo e copiar no destino através das syscalls. 
+Analisando o strace do 'cp dados/origem.txt dados/destino_cp.txt', é possível observar que ocorre um processo 
+muito maior do que no programa que foi feito.
 ```
 
 ---
